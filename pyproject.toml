@@ -1,0 +1,59 @@
+[tool.poetry]
+name = "mcp_code_agent"
+version = "0.1.0"
+description = ""
+authors = ["Jakub Žovák"]
+readme = "README.md"
+packages = [
+    { include = "mcp_code_agent", from = "src" }
+]
+
+
+[tool.poetry.dependencies]
+python = "^3.11"
+mcp = "^1.5.0"
+python-dotenv = "^1.1.0"
+openai = "^1.68.2"
+
+
+[tool.poetry.group.dev.dependencies]
+ruff = "^0.11.2" # linter
+mypy = "^1.15.0" # static type checker
+poethepoet = "^0.33.1" # task runner
+pre-commit = "^4.2.0"
+mkdocs = "^1.6.1"
+mkdocs-material = "^9.6.9"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.ruff]
+line-length = 88
+target-version = "py311"
+
+[tool.ruff.lint]
+select = [
+    "E",   # pycodestyle
+    "F",   # pyflakes
+    "I",   # isort
+    "UP",  # pyupgrade
+    "D",   # pydocstyle (docstring conventions)
+]
+ignore = ["D104", "D100"]  # Ignore missing docstring in public package/module
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[tool.mypy]
+python_version = "3.11"
+mypy_path = "src"
+strict = true
+ignore_missing_imports = true
+disallow_untyped_calls = false
+disable_error_code = ["no-any-return"]
+
+[tool.poe.tasks]
+lint = "poetry run ruff check . --fix"
+typecheck = "mypy -m mcp_code_agent"
+check = ["lint", "typecheck"]
