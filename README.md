@@ -2,7 +2,7 @@
 [![Python Version](https://img.shields.io/badge/Python-3.11-blue?logo=python&logoColor=white)](https://www.python.org/downloads/release/python-3110/) [![MCP Version](https://img.shields.io/badge/MCP-1.5.0-orange?logo=anthropic&logoColor=white)](https://pypi.org/project/mcp/) [![OpenAI Version](https://img.shields.io/badge/OpenAI-1.68.2-lightgrey?logo=openai&logoColor=whit)](https://pypi.org/project/openai/)
 
 ## 📘 Overview
-This is a Python project designed to interact with the MCP framework and OpenAI LLMs.
+This project implements AI agent with the use of OpenAI LLMs that is designed to interact with the MCP framework and.
 
 ## 📦 Installation
 First, ensure you have [Poetry installed](https://python-poetry.org/docs/#installation).
@@ -10,12 +10,26 @@ First, ensure you have [Poetry installed](https://python-poetry.org/docs/#instal
 ```bash
 poetry install
 ```
-
 ## 🚀 Running the Project
-To run the project, use the following command (make sure **docker** daemon is running on your system):
-```bash
-poetry run poe app
-```
+
+1. **Ensure Docker is Running**
+   Make sure the Docker daemon is active on your system. You can check this by running:
+   ```bash
+   docker info
+   ```
+   If Docker is not installed, follow the [official Docker installation guide](https://docs.docker.com/get-docker/) for your operating system.
+
+2. **Start the MCP Weather Server**
+   Launch the weather server using:
+   ```bash
+   poetry run poe weather_server
+   ```
+
+3. **Run the Chainlit Application**
+   Start the Chainlit app with:
+   ```bash
+   poetry run poe app
+   ```
 
 ## Development Setup
 This project uses `pre-commit` to ensure consistent code quality before commits.

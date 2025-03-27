@@ -11,10 +11,10 @@ from openai.types.chat.chat_completion_message_tool_call import (
 )
 
 from src.mcp_code_agent.agent.agent import MCPAgent
+from src.mcp_code_agent.mcp_clients.mcp_sse_client import MCPSSEClient
 from src.mcp_code_agent.mcp_clients.mcp_stdio_client import MCPStdioClient
 
-print("Root call")
-
+# Initiate the agent and MCP clients
 mcp_stdio_client = MCPStdioClient(
     "docker",
     [
@@ -27,6 +27,7 @@ mcp_stdio_client = MCPStdioClient(
         "--db-path",
         "/mcp/test.db",
     ])
+mcp_sse_client = MCPSSEClient(server_url="http://localhost:5000/sse")
 mcp_agent = MCPAgent()
 
 
@@ -52,13 +53,20 @@ async def set_starters() -> list[cl.Starter]:
 async def on_chat_start():
     """Function to handle Chainlit on chat start hook event."""
     print("A new chat session has started!")
+
     if not mcp_stdio_client.session_is_active():
         await mcp_stdio_client.start()
-        converted_tools = await mcp_stdio_client.get_converted_mcp_tools()
-        mcp_agent.configure_tools(converted_tools)
+        stdio_converted_tools = await mcp_stdio_client.get_converted_mcp_tools()
+
+        if not mcp_sse_client.session_is_active():
+            await mcp_sse_client.start()
+            sse_converted_tools = await mcp_sse_client.get_converted_mcp_tools()
+
+            all_tools = stdio_converted_tools | sse_converted_tools
+            mcp_agent.configure_tools(all_tools)
 
 @cl.step(type="tool", show_input=True)
-async def handle_tool(tool_call: ChatCompletionMessageToolCall) -> str:
+async def tool(tool_call: ChatCompletionMessageToolCall) -> str:
     """Function to handle tool calls.
 
     Args:
@@ -67,6 +75,8 @@ async def handle_tool(tool_call: ChatCompletionMessageToolCall) -> str:
     Returns:
         str: Tool result.
     """
+    current_step = cl.context.current_step
+    current_step.name = f"Tool: {tool_call.function.name}"
     tool_result = await mcp_agent.evaluate_tool(tool_call)
     return tool_result
 
@@ -82,7 +92,7 @@ async def on_message(msg: cl.Message):
 
     if tool_calls is not None:
         for tool_call in tool_calls:
-            await handle_tool(tool_call)
+            await tool(tool_call)
 
         tool_aware_answer = await mcp_agent.tool_aware_query()
 

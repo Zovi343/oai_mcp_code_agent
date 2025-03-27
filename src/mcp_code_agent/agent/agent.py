@@ -2,7 +2,7 @@ import json
 import os
 
 from dotenv import load_dotenv
-from mcp_clients.too_typesl import CustomOpenAITool
+from mcp_clients.tool_types import CustomOpenAITool
 from openai import AsyncAzureOpenAI
 from openai.types.chat.chat_completion import ChatCompletion
 from openai.types.chat.chat_completion_message_tool_call import (

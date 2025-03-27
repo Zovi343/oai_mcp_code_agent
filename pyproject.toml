@@ -11,10 +11,11 @@ packages = [
 
 [tool.poetry.dependencies]
 python = "^3.11"
-mcp = "^1.5.0"
+mcp = {extras = ["cli"], version = "^1.5.0"}
 python-dotenv = "^1.1.0"
 openai = "^1.68.2"
 chainlit = "^2.4.302"
+argparse = "^1.4.0"
 
 
 [tool.poetry.group.dev.dependencies]
@@ -56,4 +57,5 @@ disable_error_code = ["no-any-return"]
 lint = "poetry run ruff check . --fix"
 typecheck = "mypy -m mcp_code_agent"
 app = "poetry run chainlit run ./src/mcp_code_agent/app.py"
+weather_server = "poetry run python -m src.servers.weather"
 check = ["lint", "typecheck"]
