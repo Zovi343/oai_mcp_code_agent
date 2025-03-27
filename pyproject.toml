@@ -14,6 +14,7 @@ python = "^3.11"
 mcp = "^1.5.0"
 python-dotenv = "^1.1.0"
 openai = "^1.68.2"
+chainlit = "^2.4.302"
 
 
 [tool.poetry.group.dev.dependencies]
@@ -54,4 +55,5 @@ disable_error_code = ["no-any-return"]
 [tool.poe.tasks]
 lint = "poetry run ruff check . --fix"
 typecheck = "mypy -m mcp_code_agent"
+app = "poetry run chainlit run ./src/mcp_code_agent/app.py"
 check = ["lint", "typecheck"]
