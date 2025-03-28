@@ -16,23 +16,56 @@ mcp = FastMCP("weather")
 
 @mcp.tool()
 async def get_forecast(location: str) -> str:
-    """Get mocked weather forecast for a location.
+    """Get weather forecast for a location or address.
 
     Args:
         location: Location name or address.
 
     Returns:
-        A string containing a single weather forecast period.
+        A string containing a single weather forecast for the location.
     """
-    period = {
-        "name": "Today",
-        "temperature": 68,
-        "temperatureUnit": "F",
-        "windSpeed": "10 mph",
-        "windDirection": "NE",
-        "detailedForecast":
-            "Partly cloudy with a chance of light rain in the afternoon.",
-    }
+    location_lower = location.lower()
+
+    if "toronto" in location_lower:
+        period = {
+            "name": "Today",
+            "temperature": 15,
+            "temperatureUnit": "C",
+            "windSpeed": "20 km/h",
+            "windDirection": "NW",
+            "detailedForecast":
+                "Cloudy with a chance of light showers in the evening.",
+        }
+    elif "london" in location_lower:
+        period = {
+            "name": "Today",
+            "temperature": 12,
+            "temperatureUnit": "C",
+            "windSpeed": "15 km/h",
+            "windDirection": "SW",
+            "detailedForecast":
+                "Overcast skies with periods of drizzle throughout the day.",
+        }
+    elif "seattle" in location_lower:
+        period = {
+            "name": "Today",
+            "temperature": 13,
+            "temperatureUnit": "C",
+            "windSpeed": "18 km/h",
+            "windDirection": "W",
+            "detailedForecast":
+                "Rainy and cool with occasional breaks in the clouds.",
+        }
+    else:
+        period = {
+            "name": "Today",
+            "temperature": 16,
+            "temperatureUnit": "C",
+            "windSpeed": "10 km/h",
+            "windDirection": "E",
+            "detailedForecast":
+                "Mild weather with variable cloudiness.",
+        }
 
     forecast = f"""
 {period['name']}:

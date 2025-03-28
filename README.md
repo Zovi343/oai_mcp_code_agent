@@ -2,7 +2,7 @@
 [![Python Version](https://img.shields.io/badge/Python-3.11-blue?logo=python&logoColor=white)](https://www.python.org/downloads/release/python-3110/) [![MCP Version](https://img.shields.io/badge/MCP-1.5.0-orange?logo=anthropic&logoColor=white)](https://pypi.org/project/mcp/) [![OpenAI Version](https://img.shields.io/badge/OpenAI-1.68.2-lightgrey?logo=openai&logoColor=whit)](https://pypi.org/project/openai/)
 
 ## 📘 Overview
-This project implements AI agent with the use of OpenAI LLMs that is designed to interact with the MCP framework and.
+This project implements AI agent with the use of OpenAI LLMs that is designed to interact with the MCP framework. Support for the [code actions](https://arxiv.org/abs/2402.01030) within this repository in progress.
 
 ## 📦 Installation
 First, ensure you have [Poetry installed](https://python-poetry.org/docs/#installation).

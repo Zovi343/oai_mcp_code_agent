@@ -1,18 +1,20 @@
 import os
 import sys
+from typing import Any
 
 # Add the parent directory to the sys.path
 # This is necessary so that the chainlit can see the module imports.
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
 
 import chainlit as cl
+from mcp import ClientSession
+from mcp_clients.sse_client import MCPSSEClient
+from mcp_clients.stdio_client import MCPStdioClient
 from openai.types.chat.chat_completion_message_tool_call import (
     ChatCompletionMessageToolCall,
 )
 
 from src.mcp_code_agent.agent.agent import MCPAgent
-from src.mcp_code_agent.mcp_clients.mcp_sse_client import MCPSSEClient
-from src.mcp_code_agent.mcp_clients.mcp_stdio_client import MCPStdioClient
 
 # Initiate the agent and MCP clients
 mcp_stdio_client = MCPStdioClient(
@@ -27,9 +29,33 @@ mcp_stdio_client = MCPStdioClient(
         "--db-path",
         "/mcp/test.db",
     ])
-mcp_sse_client = MCPSSEClient(server_url="http://localhost:5000/sse")
+mcp_sse_client = MCPSSEClient(
+    server_url=f"http://localhost:{os.getenv('WEATHER_API_PORT')}/sse"
+    )
 mcp_agent = MCPAgent()
 
+@cl.on_mcp_connect
+async def on_mcp_connect(connection: Any, session: ClientSession):
+    """Function to handle Chainlit on MCP connect hook event.
+
+    Args:
+        connection (Any): Connection object.
+        session (ClientSession): MCP client session object.
+    """
+    print("connection", connection)
+
+    if connection.clientType == "sse":
+        # Register SSE MCP server through Chainlit UI
+        custom_mcp_server = MCPSSEClient(server_url="", session=session)
+        (
+            converted_mcp_tools,
+            original_mcp_tools
+        ) = await custom_mcp_server.get_converted_mcp_tools()
+
+        mcp_agent.add_tools(converted_mcp_tools)
+        cl.user_session.set("mcp_tools", original_mcp_tools.tools)
+    elif connection.clientType == "stdio":
+        print("Custom stdio server not supported yet.")
 
 @cl.set_starters
 async def set_starters() -> list[cl.Starter]:
@@ -54,16 +80,22 @@ async def on_chat_start():
     """Function to handle Chainlit on chat start hook event."""
     print("A new chat session has started!")
 
-    if not mcp_stdio_client.session_is_active():
-        await mcp_stdio_client.start()
-        stdio_converted_tools = await mcp_stdio_client.get_converted_mcp_tools()
+    # Register custom MCP servers
+    try:
+        if not mcp_stdio_client.session_is_active():
+            await mcp_stdio_client.start()
+            stdio_converted_tools, _ = await mcp_stdio_client.get_converted_mcp_tools()
+            mcp_agent.add_tools(stdio_converted_tools)
+    except Exception:
+        print("Failed to register stdio SQLite server.")
 
+    try:
         if not mcp_sse_client.session_is_active():
             await mcp_sse_client.start()
-            sse_converted_tools = await mcp_sse_client.get_converted_mcp_tools()
-
-            all_tools = stdio_converted_tools | sse_converted_tools
-            mcp_agent.configure_tools(all_tools)
+            sse_converted_tools, _ = await mcp_sse_client.get_converted_mcp_tools()
+            mcp_agent.add_tools(sse_converted_tools)
+    except Exception:
+        print("Failed to register SSE Weather server.")
 
 @cl.step(type="tool", show_input=True)
 async def tool(tool_call: ChatCompletionMessageToolCall) -> str:

@@ -79,4 +79,4 @@ class MCPClient(ABC):
                 },
             }
 
-        return custom_tools
+        return custom_tools, mcp_tools

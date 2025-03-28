@@ -37,7 +37,9 @@ class MCPAgent:
             },
         ]
 
-    def configure_tools(self, tools: dict[str, CustomOpenAITool]):
+        self.tools: dict[str, CustomOpenAITool] | None = None
+
+    def add_tools(self, tools: dict[str, CustomOpenAITool]):
         """Configure the tools for the agent.
 
         Args:
@@ -49,7 +51,10 @@ class MCPAgent:
         if not tools:
             raise ValueError("No tools provided!")
 
-        self.tools = tools
+        if self.tools:
+            self.tools | tools
+        else:
+            self.tools = tools
         self.tool_list = [tool["schema"] for tool in self.tools.values()]
 
 
