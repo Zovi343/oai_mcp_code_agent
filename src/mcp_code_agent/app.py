@@ -66,12 +66,19 @@ async def set_starters() -> list[cl.Starter]:
     """
     return [
         cl.Starter(
-            label="List all rows from a table",
-            message="List all the rows from the `test_table` table.",
+            label="Create `users` table.",
+            message="""
+Create table called `users` with the following columns:
+`id`, `name`, `street`, `city`, `country`.
+            """,
         ),
         cl.Starter(
             label="Database tool query.",
             message="Can you list all the tables in the database?",
+        ),
+        cl.Starter(
+            label="Weather query.",
+            message="What is the weather in Toronto?",
         ),
     ]
 
